@@ -1,0 +1,23 @@
+# ===== 构建产物（CLion / CMake 生成，不需要上传）=====
+build/
+cmake-build-*/
+*.elf
+*.map
+*.hex
+*.bin
+*.o
+*.obj
+*.d
+compile_commands.json
+
+# ===== 分析 / 临时副本 =====
+_analysis_utf8/
+
+# ===== IDE / 编辑器 / 本工具工作目录 =====
+.idea/
+.vscode/
+.workbuddy/
+
+# ===== 系统文件 =====
+.DS_Store
+Thumbs.db

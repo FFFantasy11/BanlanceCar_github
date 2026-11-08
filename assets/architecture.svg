@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 660" width="1200" height="660" role="img">
+<title>两轮自平衡小车系统概览</title>
+<desc>三级串级控制环、控制节拍与四个实测标定常数</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="#185FA5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+</defs>
+<rect x="0" y="0" width="1200" height="660" fill="#FFFFFF"/>
+<rect x="0" y="0" width="1200" height="6" fill="#185FA5"/>
+
+<text x="60" y="62" font-family="sans-serif" font-size="26" font-weight="500" fill="#2C2C2A">两轮自平衡小车 · 系统概览</text>
+<text x="60" y="92" font-family="sans-serif" font-size="14" fill="#5F5E5A">STM32F103C8T6 / Cortex-M3 @ 72 MHz / 中断驱动 112 Hz 三级串级控制</text>
+<line x1="60" y1="114" x2="1140" y2="114" stroke="#D3D1C7" stroke-width="1"/>
+
+<rect x="60" y="140" width="340" height="200" rx="12" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.8"/>
+<text x="82" y="170" font-family="sans-serif" font-size="12" fill="#185FA5">外环 · 管"车站在哪里"</text>
+<text x="82" y="202" font-family="sans-serif" font-size="19" font-weight="500" fill="#0C447C">速度环 PI</text>
+<line x1="82" y1="216" x2="378" y2="216" stroke="#B5D4F4" stroke-width="1"/>
+<text x="82" y="244" font-family="sans-serif" font-size="13" fill="#2C2C2A">输入：左右编码器速度（TIM2 / TIM4）</text>
+<text x="82" y="270" font-family="sans-serif" font-size="13" fill="#2C2C2A">输出：角度偏移（度），不是 PWM</text>
+<text x="82" y="296" font-family="sans-serif" font-size="13" fill="#2C2C2A">作用：不漂移，被推开后走回原位</text>
+<text x="82" y="324" font-family="monospace" font-size="12" fill="#185FA5">Kp = -0.58   Ki = -0.005</text>
+
+<path d="M404 240 L426 240" fill="none" stroke="#185FA5" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<rect x="430" y="140" width="340" height="200" rx="12" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
+<text x="452" y="170" font-family="sans-serif" font-size="12" fill="#0F6E56">内环 · 管"车立得直不直"</text>
+<text x="452" y="202" font-family="sans-serif" font-size="19" font-weight="500" fill="#085041">直立环 PD</text>
+<line x1="452" y1="216" x2="748" y2="216" stroke="#9FE1CB" stroke-width="1"/>
+<text x="452" y="244" font-family="sans-serif" font-size="13" fill="#2C2C2A">输入：倾角 roll、角速度 gyrox</text>
+<text x="452" y="270" font-family="sans-serif" font-size="13" fill="#2C2C2A">输出：基础 PWM（两轮同向）</text>
+<text x="452" y="296" font-family="sans-serif" font-size="13" fill="#2C2C2A">作用：不倒，唯一不可省略的环</text>
+<text x="452" y="324" font-family="monospace" font-size="12" fill="#0F6E56">Kp = -159   Kd = -0.8</text>
+
+<rect x="800" y="140" width="340" height="200" rx="12" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.8"/>
+<text x="822" y="170" font-family="sans-serif" font-size="12" fill="#185FA5">并行 · 管"车朝向哪边"</text>
+<text x="822" y="202" font-family="sans-serif" font-size="19" font-weight="500" fill="#0C447C">转向环 PI</text>
+<line x1="822" y1="216" x2="1118" y2="216" stroke="#B5D4F4" stroke-width="1"/>
+<text x="822" y="244" font-family="sans-serif" font-size="13" fill="#2C2C2A">输入：目标角速度 − 实测 gyroz</text>
+<text x="822" y="270" font-family="sans-serif" font-size="13" fill="#2C2C2A">输出：差速 PWM</text>
+<text x="822" y="296" font-family="sans-serif" font-size="13" fill="#2C2C2A">作用：可控转向，自动抑制自转</text>
+<text x="822" y="324" font-family="monospace" font-size="12" fill="#185FA5">Kp = 0.8   Ki = 0.02</text>
+
+<text x="600" y="366" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#5F5E5A">速度环输出叠加到直立环的角度目标；直立环 PWM 与转向环差速在输出端合成为 MOTO1 = V − T、MOTO2 = V + T</text>
+
+<rect x="60" y="388" width="1080" height="76" rx="10" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.8"/>
+<text x="82" y="418" font-family="sans-serif" font-size="14" font-weight="500" fill="#2C2C2A">控制节拍：MPU6050 INT (PB5) → EXTI9_5 → Control()，实测每 8.9 ms 执行一次</text>
+<text x="82" y="444" font-family="sans-serif" font-size="13" fill="#5F5E5A">主循环只做约 20 Hz 的 VOFA+ 遥测和每 200 ms 的 OLED 刷新；串口一帧阻塞约 25 ms，所以控制必须放在中断里</text>
+
+<rect x="60" y="486" width="255" height="104" rx="10" fill="#FFFFFF" stroke="#B5D4F4" stroke-width="0.8"/>
+<text x="80" y="522" font-family="sans-serif" font-size="24" font-weight="500" fill="#0C447C">8.9 ms</text>
+<text x="80" y="548" font-family="sans-serif" font-size="13" font-weight="500" fill="#2C2C2A">控制周期 · 112 Hz</text>
+<text x="80" y="572" font-family="sans-serif" font-size="12" fill="#5F5E5A">100 次中断取平均</text>
+
+<rect x="335" y="486" width="255" height="104" rx="10" fill="#FFFFFF" stroke="#B5D4F4" stroke-width="0.8"/>
+<text x="355" y="522" font-family="sans-serif" font-size="24" font-weight="500" fill="#0C447C">8197</text>
+<text x="355" y="548" font-family="sans-serif" font-size="13" font-weight="500" fill="#2C2C2A">编码器计数 / 米</text>
+<text x="355" y="572" font-family="sans-serif" font-size="12" fill="#5F5E5A">手推恰好 1.00 m 实测</text>
+
+<rect x="610" y="486" width="255" height="104" rx="10" fill="#FFFFFF" stroke="#B5D4F4" stroke-width="0.8"/>
+<text x="630" y="522" font-family="sans-serif" font-size="24" font-weight="500" fill="#0C447C">2.20°</text>
+<text x="630" y="548" font-family="sans-serif" font-size="13" font-weight="500" fill="#2C2C2A">机械中心角</text>
+<text x="630" y="572" font-family="sans-serif" font-size="12" fill="#5F5E5A">跑起来后取倾角均值</text>
+
+<rect x="885" y="486" width="255" height="104" rx="10" fill="#FFFFFF" stroke="#B5D4F4" stroke-width="0.8"/>
+<text x="905" y="522" font-family="sans-serif" font-size="24" font-weight="500" fill="#0C447C">4.86%</text>
+<text x="905" y="548" font-family="sans-serif" font-size="13" font-weight="500" fill="#2C2C2A">电机死区 350 / 7200</text>
+<text x="905" y="572" font-family="sans-serif" font-size="12" fill="#5F5E5A">空载逐步加 PWM 观察起转</text>
+
+<text x="60" y="628" font-family="sans-serif" font-size="12" fill="#888780">四个基础常数全部为实测标定，而非理论推算；它们决定了整套控制参数的取值。</text>
+</svg>
